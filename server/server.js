@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors"); 
 const authRouter = require("./routes/auth/auth-routes");
+const adminProductRouter = require("./routes/admin/products-routes");
 
 //create database connection
 //create a seprate file for this and then import it here
@@ -35,6 +36,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 app.use('/api/auth', authRouter);
+app.use("/api/admin/products", adminProductRouter);
 
 app.listen(port, () => 
   console.log(`Server is running on port ${port}`));

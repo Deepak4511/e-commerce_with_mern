@@ -83,7 +83,7 @@ const loginUser = async (req, res) => {
 //logout
 
 
-const logout = (req, res) => {
+const logoutUser = (req, res) => {
   try {
     res.clearCookie("token");
     res.status(200).json({
@@ -124,4 +124,4 @@ const authMiddleware = async (req, res, next) => {
 };
 
 
-module.exports = { registerUser, loginUser, logout, middleware };
+module.exports = { registerUser, loginUser, logoutUser, authMiddleware };

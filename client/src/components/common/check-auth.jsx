@@ -5,6 +5,8 @@ const CheckAuth = ({ isAuthenticated, user, children }) => {
   const location = useLocation();
 
   // Unauthenticated access to protected routes
+  console.log(location.pathname, isAuthenticated);
+  
   if (
     !isAuthenticated &&
     !(
