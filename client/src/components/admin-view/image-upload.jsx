@@ -3,12 +3,15 @@ import { Input } from "../ui/input";
 import { FileIcon, UploadCloudIcon, XIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import axios from "axios";
+import { Skeleton } from "../ui/skeleton";
 
 const ProductImageUpload = ({
   imageFile,
   setImageFile,
-  uploadImageUrl,
+  // uploadImageUrl,
   setUploadImageUrl,
+  setImageLoadingState,
+  imageLoadingState,
 }) => {
   const inputRef = useRef(null);
 
@@ -36,12 +39,17 @@ const ProductImageUpload = ({
   }
 
   async function uploadImageToCloudinary() {
+    setImageLoadingState(true);
     const data = new FormData();
     data.append("my_file", imageFile);
-    const response = await axios.post('http://localhost:5000/api/admin/products/upload-image', data)
-    console.log('response', response);
-    if (response) {
-      setUploadImageUrl(response.data);
+    const response = await axios.post(
+      "http://localhost:5000/api/admin/products/upload-image",
+      data
+    );
+    console.log("response", response);
+    if (response?.data?.success) {
+      setUploadImageUrl(response.data.result.url);
+      setImageLoadingState(false);
     } else {
       console.error("Error uploading image:", response.statusText);
     }
@@ -74,13 +82,20 @@ const ProductImageUpload = ({
             <UploadCloudIcon className="w-10 h-10 text-muted-foreground  mb-2" />
             <span>Drag & Drop or click to upload image</span>
           </label>
-        ) : (
+        ) : 
+          imageLoadingState ? ( <Skeleton className="h-10 bg-gray-100 " /> 
+          ) : (
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <FileIcon className="w-8 h-8 text-primary mr-2" />
             </div>
             <p className="text-sm font-medium">{imageFile.name}</p>
-            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground" onClick={handleRemoveImage}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:text-foreground"
+              onClick={handleRemoveImage}
+            >
               <XIcon className="w-4 h-4" />
               <span className="sr-only">Remove File</span>
             </Button>
