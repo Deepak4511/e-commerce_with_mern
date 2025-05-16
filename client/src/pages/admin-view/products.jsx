@@ -31,6 +31,7 @@ const Adminproducts = () => {
   const [imageFile, setImageFile] = useState(null);
   const [uploadImageUrl, setUploadImageUrl] = useState("");
   const [imageLoadingState, setImageLoadingState] = useState(false);
+  const [currentEditedId, setCurrentEditedId] = useState(null);
   const { productList } = useSelector((state) => state.adminProducts);
   const dispatch = useDispatch();
 
@@ -68,10 +69,11 @@ const Adminproducts = () => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {
-          productList && productList.length > 0 ?
-          productList.map(productItem => <AdminProductTile product={ productItem }/>) : null
-        }
+        {productList && productList.length > 0
+          ? productList.map((productItem) => (
+              <AdminProductTile setCurrentEditedId={setCurrentEditedId} product={productItem} />
+            ))
+          : null}
       </div>
 
       <Sheet

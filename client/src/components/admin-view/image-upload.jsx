@@ -8,7 +8,7 @@ import { Skeleton } from "../ui/skeleton";
 const ProductImageUpload = ({
   imageFile,
   setImageFile,
-  // uploadImageUrl,
+  uploadImageUrl,
   setUploadImageUrl,
   setImageLoadingState,
   imageLoadingState,
