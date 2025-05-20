@@ -52,25 +52,24 @@ const loginUser = async (req, res) => {
         message: "Password is incorrect! Please try again",
       });
 
-      const token = jwt.sign(
-        { id: checkUser._id, role: checkUser.role , email: checkUser.email },
-        'CLIENT_SECRET_KEY', // process.env.JWT_SECRET,
-        { expiresIn: "60m" }
-        // process.env.JWT_SECRET,
-        // { expiresIn: "1d" }
-      );
+    const token = jwt.sign(
+      { id: checkUser._id, role: checkUser.role, email: checkUser.email, userName: checkUser.userName },
+      "CLIENT_SECRET_KEY", // process.env.JWT_SECRET,
+      { expiresIn: "60m" }
+      // process.env.JWT_SECRET,
+      // { expiresIn: "1d" }
+    );
 
-      res.cookie("token", token, {httpOnly: true, secure: false}).json({
-        success: true,
-        message: "Login successfully",
-        user: {
-          id: checkUser._id,
-          userName: checkUser.userName,
-          email: checkUser.email,
-          role: checkUser.role,
-        },
-      })
-
+    res.cookie("token", token, { httpOnly: true, secure: false }).json({
+      success: true,
+      message: "Login successfully",
+      user: {
+        id: checkUser._id,
+        userName: checkUser.userName,
+        email: checkUser.email,
+        role: checkUser.role,
+      },
+    });
   } catch (e) {
     console.log(e);
     res.status(500).json({
@@ -81,7 +80,6 @@ const loginUser = async (req, res) => {
 };
 
 //logout
-
 
 const logoutUser = (req, res) => {
   try {
@@ -112,7 +110,7 @@ const authMiddleware = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, 'CLIENT_SECRET_KEY'); // use process.env.JWT_SECRET in production
+    const decoded = jwt.verify(token, "CLIENT_SECRET_KEY"); // use process.env.JWT_SECRET in production
     req.user = decoded; // decoded contains id, role, email
     next();
   } catch (error) {
@@ -122,6 +120,5 @@ const authMiddleware = async (req, res, next) => {
     });
   }
 };
-
 
 module.exports = { registerUser, loginUser, logoutUser, authMiddleware };

@@ -1,48 +1,43 @@
-
-
-export const registerFormControls =[
-    {
-        name: 'userName',
-        label: 'User name',
-        placeholder: 'Enter your username',
-        type: 'text',
-        componentType: 'input',
-    },
-    {
-        name: 'email',
-        label: 'Email',
-        placeholder: 'Enter your Email',
-        type: 'email',
-        componentType: 'input',
-    },
-    {
-        name: 'password',
-        label: 'password',
-        placeholder: 'Enter your password',
-        type: 'password',
-        componentType: 'input',
-    }
+export const registerFormControls = [
+  {
+    name: "userName",
+    label: "User name",
+    placeholder: "Enter your username",
+    type: "text",
+    componentType: "input",
+  },
+  {
+    name: "email",
+    label: "Email",
+    placeholder: "Enter your Email",
+    type: "email",
+    componentType: "input",
+  },
+  {
+    name: "password",
+    label: "password",
+    placeholder: "Enter your password",
+    type: "password",
+    componentType: "input",
+  },
 ];
 
-
-export const loginFormControls =[
-    {
-        name: 'email',
-        label: 'Email',
-        placeholder: 'Enter your Email',
-        type: 'email',
-        componentType: 'input',
-    },
-    {
-        name: 'password',
-        label: 'password',
-        placeholder: 'Enter your password',
-        type: 'password',
-        componentType: 'input',
-    }
+export const loginFormControls = [
+  {
+    name: "email",
+    label: "Email",
+    placeholder: "Enter your Email",
+    type: "email",
+    componentType: "input",
+  },
+  {
+    name: "password",
+    label: "password",
+    placeholder: "Enter your password",
+    type: "password",
+    componentType: "input",
+  },
 ];
-
-
 
 export const addProductFormElements = [
   {
@@ -103,5 +98,43 @@ export const addProductFormElements = [
     componentType: "input",
     type: "number",
     placeholder: "Enter total stock",
+  },
+];
+
+export const shoppingViewHeaderMenuItems = [
+  {
+    id: "home",
+    label: "Home",
+    path: "/shop/home",
+  },
+  {
+    id: "men",
+    label: "Men",
+    path: "/shop/listing",
+  },
+  {
+    id: "Women",
+    label: "Women",
+    path: "/shoplisting",
+  },
+  {
+    id: "kids",
+    label: "Kids",
+    path: "/shop/listing",
+  },
+  {
+    id: "watch",
+    label: "Watch",
+    path: "/shop/listing",
+  },
+  {
+    id: "kids",
+    label: "Kids",
+    path: "/shop/listing",
+  },
+  {
+    id: "accessories",
+    label: "Accessories",
+    path: "/shop/listing",
   },
 ];
