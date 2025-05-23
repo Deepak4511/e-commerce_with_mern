@@ -1,5 +1,5 @@
-const Cart = require("../../models/cart");
-const Product = require("../../models/product");
+const Cart = require("../../models/Cart");
+const Product = require("../../models/Product");
 
 const addToCart = async (req, res) => {
   try {
@@ -12,13 +12,14 @@ const addToCart = async (req, res) => {
       });
     }
 
-    const product = await Product.findById(product);
+    const product = await Product.findById(productId);
 
-    if (!product)
+    if (!product) {
       return res.status(404).json({
         success: false,
         message: "Product not found",
       });
+    }
 
     let cart = await Cart.findOne({ userId });
 
@@ -57,25 +58,26 @@ const fetchCartItems = async (req, res) => {
     if (!userId) {
       return res.status(400).json({
         success: false,
-        message: "User id is mandatory!",
+        message: "User id is manadatory!",
       });
     }
 
-    const cart = await Cart.findById({ userId }).populate({
-      path: "item.productId",
+    const cart = await Cart.findOne({ userId }).populate({
+      path: "items.productId",
       select: "image title price salePrice",
     });
 
     if (!cart) {
       return res.status(404).json({
         success: false,
-        message: "Cart not found",
+        message: "Cart not found!",
       });
     }
 
     const validItems = cart.items.filter(
       (productItem) => productItem.productId
     );
+
     if (validItems.length < cart.items.length) {
       cart.items = validItems;
       await cart.save();
@@ -121,7 +123,7 @@ const updateCartItemQty = async (req, res) => {
     if (!cart) {
       return res.status(404).json({
         success: false,
-        message: "Cart not found",
+        message: "Cart not found!",
       });
     }
 
@@ -129,9 +131,37 @@ const updateCartItemQty = async (req, res) => {
       (item) => item.productId.toString() === productId
     );
 
-    if(findCurrentProductIndex == -1){
-        return res.staus(404).json
+    if (findCurrentProductIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: "Cart item not present !",
+      });
     }
+
+    cart.items[findCurrentProductIndex].quantity = quantity;
+    await cart.save();
+
+    await cart.populate({
+      path: "items.productId",
+      select: "image title price salePrice",
+    });
+
+    const populateCartItems = cart.items.map((item) => ({
+      productId: item.productId ? item.productId._id : null,
+      image: item.productId ? item.productId.image : null,
+      title: item.productId ? item.productId.title : "Product not found",
+      price: item.productId ? item.productId.price : null,
+      salePrice: item.productId ? item.productId.salePrice : null,
+      quantity: item.quantity,
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: {
+        ...cart._doc,
+        items: populateCartItems,
+      },
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -141,8 +171,55 @@ const updateCartItemQty = async (req, res) => {
   }
 };
 
-const DeleteCartItem = async (req, res) => {
+const deleteCartItem = async (req, res) => {
   try {
+    const { userId, productId } = req.params;
+    if (!userId || !productId) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid data provided!",
+      });
+    }
+
+    const cart = await Cart.findOne({ userId }).populate({
+      path: "items.productId",
+      select: "image title price salePrice",
+    });
+
+    if (!cart) {
+      return res.status(404).json({
+        success: false,
+        message: "Cart not found!",
+      });
+    }
+
+    cart.items = cart.items.filter(
+      (item) => item.productId._id.toString() !== productId
+    );
+
+    await cart.save();
+
+    await cart.populate({
+      path: "items.productId",
+      select: "image title price salePrice",
+    });
+
+    const populateCartItems = cart.items.map((item) => ({
+      productId: item.productId ? item.productId._id : null,
+      image: item.productId ? item.productId.image : null,
+      title: item.productId ? item.productId.title : "Product not found",
+      price: item.productId ? item.productId.price : null,
+      salePrice: item.productId ? item.productId.salePrice : null,
+      quantity: item.quantity,
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: {
+        ...cart._doc,
+        items: populateCartItems,
+      },
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -155,6 +232,6 @@ const DeleteCartItem = async (req, res) => {
 module.exports = {
   addToCart,
   updateCartItemQty,
-  DeleteCartItem,
+  deleteCartItem,
   fetchCartItems,
 };
