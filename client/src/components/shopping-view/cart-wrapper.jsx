@@ -2,7 +2,6 @@ import React from "react";
 import { SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
 import { Button } from "../ui/button";
 import UserCartItemsContent from "./cart-items-content";
-import { current } from "@reduxjs/toolkit";
 
 const UserCartWrapper = ({ cartItems }) => {
   const totalCartAmount =
