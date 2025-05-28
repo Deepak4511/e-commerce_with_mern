@@ -52,7 +52,6 @@ const Shopinglisting = () => {
   }
 
   function handleFilter(getSectionId, getCurrentOption) {
-    console.log(getSectionId, getCurrentOption);
 
     let copyFilters = { ...filters };
     const indexOfCurrentSection =
@@ -171,7 +170,7 @@ const Shopinglisting = () => {
       </div>
       <ProductDetailsDialog
         open={openDetailsDialog}
-        setOpenDetailsDialog={setOpenDetailsDialog}
+        setOpen={setOpenDetailsDialog}
         productDetails={productDetails}
       />
     </div>
