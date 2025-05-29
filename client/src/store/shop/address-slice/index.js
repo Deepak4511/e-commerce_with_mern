@@ -18,7 +18,7 @@ export const addNewAddress = createAsyncThunk(
   }
 );
 
-export const fetchAllAddress = createAsyncThunk(
+export const fetchAllAddresses = createAsyncThunk(
   "/address/fetchAllAddresses",
   async (userId) => {
     const response = await axios.get(
@@ -58,23 +58,22 @@ const addressSlice = createSlice({
       .addCase(addNewAddress.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(addNewAddress.fulfilled, (state, action) => {
+      .addCase(addNewAddress.fulfilled, (state) => {
         state.isLoading = false;
-        state.addressList = action.payload.data;
+
       })
       .addCase(addNewAddress.rejected, (state) => {
         state.isLoading = false;
-        state.addressList = [];
       })
 
-      .addCase(fetchAllAddress.pending, (state) => {
+      .addCase(fetchAllAddresses.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(fetchAllAddress.fulfilled, (state, action) => {
+      .addCase(fetchAllAddresses.fulfilled, (state, action) => {
         state.isLoading = false;
         state.addressList = action.payload.data;
       })
-      .addCase(fetchAllAddress.rejected, (state) => {
+      .addCase(fetchAllAddresses.rejected, (state) => {
         state.isLoading = false;
         state.addressList = [];
       })
@@ -83,4 +82,4 @@ const addressSlice = createSlice({
   },
 });
 
-export default addressSlice.reducers;
+export default addressSlice.reducer;

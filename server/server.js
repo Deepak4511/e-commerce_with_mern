@@ -1,49 +1,58 @@
-const cookieParser = require("cookie-parser");
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors"); 
+// Import required modules
+const cookieParser = require("cookie-parser"); // For parsing cookies from incoming requests
+const express = require("express"); // Express framework for building the server
+const mongoose = require("mongoose"); // Mongoose library to interact with MongoDB
+const cors = require("cors"); // Middleware to enable Cross-Origin Resource Sharing (CORS)
+
+// Import route handlers from separate route files
 const authRouter = require("./routes/auth/auth-routes");
 const adminProductRouter = require("./routes/admin/products-routes");
 const shopProductsRouter = require('./routes/shop/products-routes');
-const shopCartRouter = require('./routes/shop/cart-routes')
-const shopAddressRouter = require('./routes/shop/address-routes')
+const shopCartRouter = require('./routes/shop/cart-routes');
+const shopAddressRouter = require('./routes/shop/address-routes');
 
-//create database connection
-//create a seprate file for this and then import it here
-
+// ------------------- DATABASE CONNECTION -------------------
+// You can move this to a separate file like db.js for better structure
 mongoose
   .connect(
     "mongodb+srv://deepaksingh451181:byot81kdr8aDQRZs@cluster0.ec65i3c.mongodb.net/"
   )
-  .then(() => console.log(" MongoDB Connected"))
-  .catch((err) => console.log(err));
+  .then(() => console.log("MongoDB Connected")) // Successful connection
+  .catch((err) => console.log(err)); // Handle connection errors
 
-const app = express();
-const port = process.env.PORT || 5000;
+// ------------------- EXPRESS APP SETUP -------------------
+const app = express(); // Create an Express application instance
+const port = process.env.PORT || 5000; // Define server port
 
+// ------------------- CORS MIDDLEWARE -------------------
 app.use(
   cors({
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: "http://localhost:5173", // Allow requests from this origin (frontend URL)
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
     allowedHeaders: [
       "Content-Type",
-      "Authorization",
+      "Authorization",  // Allows passing tokens like Bearer tokens (JWT) for authentication
       "cache-control",
       "Expires",
-      "Pragma",
+      "Pragma",   // Used for cache control (often `no-cache`)
     ],
-    credentials: true,
+    credentials: true, // Enable sending of cookies and authentication headers
   })
 );
 
-app.use(express.json());
-app.use(cookieParser());
-app.use('/api/auth', authRouter);
-app.use("/api/admin/products", adminProductRouter);
-app.use('/api/shop/products', shopProductsRouter);
-app.use('/api/shop/cart', shopCartRouter)
-app.use('/api/shop/address', shopAddressRouter);
+// ------------------- OTHER MIDDLEWARE -------------------
+app.use(express.json()); // Parse incoming JSON payloads
+app.use(cookieParser()); // Parse cookies in incoming requests
 
+// ------------------- ROUTES -------------------
+// Use respective route handlers for different parts of the API
+app.use('/api/auth', authRouter); // Auth-related routes (login, register, etc.)
+app.use("/api/admin/products", adminProductRouter); // Admin product management routes
+app.use('/api/shop/products', shopProductsRouter); // Shop product listing and details
+app.use('/api/shop/cart', shopCartRouter); // Shopping cart functionality
+app.use('/api/shop/address', shopAddressRouter); // Address handling for checkout
+
+// ------------------- START THE SERVER -------------------
 app.listen(port, () => 
-  console.log(`Server is running on port ${port}`));
-
+  console.log(`Server is running on port ${port}`)
+);

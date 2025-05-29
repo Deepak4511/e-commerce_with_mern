@@ -20,18 +20,25 @@ import { fetchCartItems } from "@/store/shop/cart-slice";
 
 function MenuItems() {
   const navigate = useNavigate();
-  function  handleNavigate(getCurrentMenuItem){
-    sessionStorage.removeItem('filters')
-    const currentFilter = getCurrentMenuItem.id !==  'home' ? {category : [getCurrentMenuItem.id]} : null;
+  function handleNavigate(getCurrentMenuItem) {
+    sessionStorage.removeItem("filters");
+    const currentFilter =
+      getCurrentMenuItem.id !== "home"
+        ? { category: [getCurrentMenuItem.id] }
+        : null;
 
-    sessionStorage.setItem('filters', JSON.stringify(currentFilter));
-    navigate(getCurrentMenuItem.path)
+    sessionStorage.setItem("filters", JSON.stringify(currentFilter));
+    navigate(getCurrentMenuItem.path);
   }
 
   return (
     <nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row">
       {shoppingViewHeaderMenuItems.map((MenuItem) => (
-        <label onClick={()=> handleNavigate(MenuItem)} className="text-sm font-medium cursor-pointer" key={MenuItem.id}>
+        <label
+          onClick={() => handleNavigate(MenuItem)}
+          className="text-sm font-medium cursor-pointer"
+          key={MenuItem.id}
+        >
           {MenuItem.label}
         </label>
       ))}
@@ -41,33 +48,41 @@ function MenuItems() {
 
 function HeaderRightContent() {
   const { user } = useSelector((state) => state.auth);
-    const {cartItems } = useSelector((state) => state.shopCart)
-  const [openCartSheet, setOpenCartSheet] = useState(false)
+  const { cartItems } = useSelector((state) => state.shopCart);
+  const [openCartSheet, setOpenCartSheet] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  function handleLogout(){
+  function handleLogout() {
     dispatch(logoutUser());
-
   }
 
-  useEffect(()=> {
+  useEffect(() => {
     dispatch(fetchCartItems(user?.id));
   }, [dispatch]);
-
 
   console.log("Cart Items Raw:", cartItems);
 
   return (
     <div className="flex lg:items-center lg:flex-row flex-col gap-4">
-    <Sheet open ={openCartSheet} onOpenChange={()=>setOpenCartSheet(false)}>
-      <Button onClick={()=>setOpenCartSheet(true)} variant="outline" size="icon">
-        <ShoppingCart w-6 h-6 />
-        <span className="sr-only">User Cart</span>
-      </Button>
-      <UserCartWrapper  cartItems={cartItems && cartItems.items && cartItems.items.length > 0 ? cartItems.items : []}/>
-    </Sheet>
-      
+      <Sheet open={openCartSheet} onOpenChange={() => setOpenCartSheet(false)}>
+        <Button
+          onClick={() => setOpenCartSheet(true)}
+          variant="outline"
+          size="icon"
+        >
+          <ShoppingCart w-6 h-6 />
+          <span className="sr-only">User Cart</span>
+        </Button>
+        <UserCartWrapper
+        setOpenCartSheet={setOpenCartSheet}
+          cartItems={
+            cartItems && cartItems.items && cartItems.items.length > 0
+              ? cartItems.items
+              : []
+          }
+        />
+      </Sheet>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -80,7 +95,7 @@ function HeaderRightContent() {
         <DropdownMenuContent side="right" className="w-56">
           <DropdownMenuLabel>Logged in as {user?.userName}</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={()=>navigate('/shop/account')}>
+          <DropdownMenuItem onClick={() => navigate("/shop/account")}>
             <User className="mr-2 h-4 w-4" />
             Account
           </DropdownMenuItem>
@@ -114,17 +129,16 @@ const Shoppingheader = () => {
           </SheetTrigger>
           <SheetContent side="left" className="w-full max-w-xs">
             <MenuItems />
-            <HeaderRightContent/>
+            <HeaderRightContent />
           </SheetContent>
         </Sheet>
         <div className="hidden lg:block">
           <MenuItems />
         </div>
 
-          <div className="hidden lg:block">
-            <HeaderRightContent />
-          </div>
-
+        <div className="hidden lg:block">
+          <HeaderRightContent />
+        </div>
       </div>
     </header>
   );
