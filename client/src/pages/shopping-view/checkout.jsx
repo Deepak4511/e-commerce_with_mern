@@ -9,11 +9,10 @@ import { createNewOrder } from "@/store/shop/order-slice";
 const Shoppingcheckout = () => {
   const { cartItems } = useSelector((state) => state.shopCart);
   const { user } = useSelector((state) => state.auth);
-  const {approvalURl} =useSelector((state)=>state.shopOrder)
+  const { approvalURl } = useSelector((state) => state.shopOrder);
   const [currentSelectedAddress, setCurrentSelectedAddres] = useState(null);
-  const [isPaymentStart, setIsPaymentStart] =useState(false)
-  const dispatch = useDispatch()
-
+  const [isPaymentStart, setIsPaymentStart] = useState(false);
+  const dispatch = useDispatch();
 
   console.log(currentSelectedAddress, "cartItems");
 
@@ -31,8 +30,10 @@ const Shoppingcheckout = () => {
       : 0;
 
   function handleInitiatePaypalPayment() {
+    
     const orderData = {
       userId: user?.id,
+      cartId : cartItems?._id,
       cartItems: cartItems.items.map((singleCartItem) => ({
         productId: singleCartItem?.productId,
         title: singleCartItem?.title,
@@ -58,25 +59,22 @@ const Shoppingcheckout = () => {
       orderDate: new Date(),
       orderUpdateDate: new Date(),
       paymentId: "",
-      payerid: "",
+      payerId: "",
     };
 
+    dispatch(createNewOrder(orderData)).then((data) => {
 
-    dispatch(createNewOrder(orderData)).then((data)=>{
-      console.log(data, "dsaddad")
-
-      if(data?.payload?.success){
-        setIsPaymentStart(true)
-      }else{
-        setIsPaymentStart(false)
+      if (data?.payload?.success) {
+        setIsPaymentStart(true);
+      } else {
+        setIsPaymentStart(false);
       }
-    })
+    });
   }
 
-  if(approvalURl){
-    window.location.href=approvalURl
+  if (approvalURl) {
+    window.location.href = approvalURl;
   }
-
 
   return (
     <div className="flex flex-col">

@@ -6,6 +6,7 @@ const client = require("../../helpers/paypal"); // the configured PayPal client
 const { OrdersCreateRequest } = paypal.orders;
 
 const Order = require("../../models/Order");
+const Cart =require("../../models/Cart");
 
 const createOrder = async (req, res) => {
   try {
@@ -20,7 +21,8 @@ const createOrder = async (req, res) => {
       orderDate,
       orderUpdateDate,
       paymentId,
-      payerid,
+      payerId,
+      cartId,
     } = req.body;
 
     const request = new OrdersCreateRequest(); 
@@ -66,6 +68,7 @@ request.requestBody({
 
     const newlyCreatedOrder = new Order({
       userId,
+      cartId,
       cartItems,
       addressInfo,
       orderStatus,
@@ -75,7 +78,7 @@ request.requestBody({
       orderDate,
       orderUpdateDate,
       paymentId,
-      payerid,
+      payerId,
     });
 
     await newlyCreatedOrder.save();
@@ -100,7 +103,38 @@ request.requestBody({
 
 
 const capturePayment = async (req, res) => {
+
   try {
+
+      const {paymentId, payerId, OrderId } = req.body;
+
+  let order = await Order.findById(OrderId);
+
+if (!order){
+  return res.status(404).json({
+    success: false,
+    message: "Order not found",
+  });
+}
+
+order.PaymentStatus = 'paid';
+order.orderStatus ='confirmed'
+order.paymentId = paymentId;
+order.payerId = payerId;
+
+
+const getCartId =order.cartId;
+const cart = await Cart.findByIdAndDelete(getCartId);
+
+
+await order.save();
+
+res.status(200).json({
+  success: true,
+  message: "Payment captured successfully",
+  data: order,
+})
+
   } catch (e) {
     console.log(e);
     res.status(500).json({
@@ -110,218 +144,6 @@ const capturePayment = async (req, res) => {
   }
 };
 
+
+
 module.exports = { createOrder, capturePayment };
-
-
-
-
-
-
-
-// const paypal = require("../../helpers/paypal"); // This must export the PayPal client
-// const Order = require("../../models/Order");
-
-// const createOrder = async (req, res) => {
-//   try {
-//     const {
-//       userId,
-//       cartItems,
-//       addressInfo,
-//       orderStatus,
-//       paymentMethod,
-//       PaymentStatus,
-//       totalAmount,
-//       orderDate,
-//       orderUpdateDate,
-//       paymentId,
-//       payerid,
-//     } = req.body;
-
-//     const request = new paypal.orders.OrdersCreateRequest();
-//     request.prefer("return=representation");
-//     request.requestBody({
-//       intent: "CAPTURE",
-//       purchase_units: [
-//         {
-//           amount: {
-//             currency_code: "USD",
-//             value: totalAmount.toFixed(2),
-//           },
-//           items: cartItems.map((item) => ({
-//             name: item.title,
-//             sku: item.productId,
-//             unit_amount: {
-//               currency_code: "USD",
-//               value: item.price.toFixed(2),
-//             },
-//             quantity: item.quantity.toString(),
-//           })),
-//         },
-//       ],
-//       application_context: {
-//         return_url: "http://localhost:5173/shop/paypal-return",
-//         cancel_url: "http://localhost:5173/shop/paypal-cancel",
-//       },
-//     });
-
-//     const paymentInfo = await paypal.client().execute(request);
-
-//     const newlyCreatedOrder = new Order({
-//       userId,
-//       cartItems,
-//       addressInfo,
-//       orderStatus,
-//       paymentMethod,
-//       PaymentStatus,
-//       totalAmount,
-//       orderDate,
-//       orderUpdateDate,
-//       paymentId,
-//       payerid,
-//     });
-
-//     await newlyCreatedOrder.save();
-
-//     const approvalURl = paymentInfo.result.links.find(
-//       (link) => link.rel === "approve"
-//     ).href;
-
-//     res.status(201).json({
-//       success: true,
-//       approvalURl,
-//       orderId: newlyCreatedOrder._id,
-//     });
-//   } catch (e) {
-//     console.log(e);
-//     res.status(500).json({
-//       success: false,
-//       message: "Error while creating PayPal order",
-//     });
-//   }
-// };
-
-
-// const capturePayment = async (req, res) => {
-//   try {
-//   } catch (e) {
-//     console.log(e);
-//     res.status(500).json({
-//       success: false,
-//       message: "some message occured",
-//     });
-//   }
-// };
-
-// module.exports = { createOrder, capturePayment };
-
-
-
-
-
-
-
-// const paypal = require("../../helpers/paypal");
-// const Order = require("../../models/Order");
-
-// const createOrder = async (req, res) => {
-//   try {
-//     const {
-//       userId,
-//       cartItems,
-//       addressInfo,
-//       orderStatus,
-//       paymentMethod,
-//       PaymentStatus,
-//       totalAmount,
-//       orderDate,
-//       orderUpdateDate,
-//       paymentId,
-//       payerid,
-//     } = req.body;
-
-//     const create_payment_json = {
-//       intent: "sale",
-//       payer: {
-//         payment_method: "paypal",
-//       },
-//       redirect_urls: {
-//         retrun_url: "http://localhost:5173/shop/paypal-return",
-//         cancel_url: "http://localhost:5173/shop/paypal-cancel",
-//       },
-//       transaction: [
-//         {
-//           item_list: {
-//             items: cartItems.map((item) => ({
-//               name: item.title,
-//               sku: item.productId,
-//               price: item.price.toFixed(2),
-//               currency: "USD",
-//               quantity: item.quantity,
-//             })),
-//           },
-//           amount: {
-//             currency: "USD",
-//             total: totalAmount.toFixed(2),
-//           },
-//           description: "description",
-//         },
-//       ],
-//     };
-
-//     paypal.payments.create(create_payment_json, async (error, paymentInfo) => {
-//       if (error) {
-//         console.log(error);
-
-//         return res.status(500).json({
-//           success: false,
-//           message: "Errorwhile creating Paypal payment",
-//         });
-//       } else {
-//         const newlyCreatedOrder = new Order({
-//           userId,
-//           cartItems,
-//           addressInfo,
-//           orderStatus,
-//           paymentMethod,
-//           PaymentStatus,
-//           totalAmount,
-//           orderDate,
-//           orderUpdateDate,
-//           paymentId,
-//           payerid,
-//         });
-
-//         await newlyCreatedOrder.save();
-
-//         const approvalURl = paymentInfo.links.find(
-//           (link) => link.rel === "approval_url"
-//         ).href;
-
-//         res.status(201).json({
-//           success: true,
-//           approvalURl,
-//           orderId: newlyCreatedOrder._id,
-//         });
-//       }
-//     });
-//   } catch (e) {
-//     console.log(e);
-//     res.status(500).json({
-//       success: false,
-//       message: "some message occured",
-//     });
-//   }
-// };
-
-// const capturePayment = async (req, res) => {
-//   try {
-//   } catch (e) {
-//     console.log(e);
-//     res.status(500).json({
-//       success: false,
-//       message: "some message occured",
-//     });
-//   }
-// };
-
-// module.exports = { createOrder, capturePayment };
