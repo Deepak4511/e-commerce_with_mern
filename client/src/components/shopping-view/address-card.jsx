@@ -7,9 +7,10 @@ const AddressCard = ({
   addressInfo,
   handleDeleteAddress,
   handleEditAddress,
+  setCurrentSelectedAddres
 }) => {
   return (
-    <Card>
+    <Card onClick={setCurrentSelectedAddres ? ()=>setCurrentSelectedAddres(addressInfo) : null}>
       <CardContent className="grid gap-4 p-4">
         <Label>Address: {addressInfo?.address}</Label>
         <Label>City: {addressInfo?.city}</Label>

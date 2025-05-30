@@ -10,6 +10,7 @@ const adminProductRouter = require("./routes/admin/products-routes");
 const shopProductsRouter = require('./routes/shop/products-routes');
 const shopCartRouter = require('./routes/shop/cart-routes');
 const shopAddressRouter = require('./routes/shop/address-routes');
+const shopOrderRouter = require('./routes/shop/order-routes')
 
 // ------------------- DATABASE CONNECTION -------------------
 // You can move this to a separate file like db.js for better structure
@@ -51,6 +52,7 @@ app.use("/api/admin/products", adminProductRouter); // Admin product management 
 app.use('/api/shop/products', shopProductsRouter); // Shop product listing and details
 app.use('/api/shop/cart', shopCartRouter); // Shopping cart functionality
 app.use('/api/shop/address', shopAddressRouter); // Address handling for checkout
+app.use('/api/shop/order', shopOrderRouter);
 
 // ------------------- START THE SERVER -------------------
 app.listen(port, () => 
