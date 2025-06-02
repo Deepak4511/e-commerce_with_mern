@@ -7,10 +7,13 @@ const cors = require("cors"); // Middleware to enable Cross-Origin Resource Shar
 // Import route handlers from separate route files
 const authRouter = require("./routes/auth/auth-routes");
 const adminProductRouter = require("./routes/admin/products-routes");
+const adminOrderRouter = require('./routes/admin/order-routes')
+
 const shopProductsRouter = require('./routes/shop/products-routes');
 const shopCartRouter = require('./routes/shop/cart-routes');
 const shopAddressRouter = require('./routes/shop/address-routes');
 const shopOrderRouter = require('./routes/shop/order-routes')
+
 
 // ------------------- DATABASE CONNECTION -------------------
 // You can move this to a separate file like db.js for better structure
@@ -49,6 +52,8 @@ app.use(cookieParser()); // Parse cookies in incoming requests
 // Use respective route handlers for different parts of the API
 app.use('/api/auth', authRouter); // Auth-related routes (login, register, etc.)
 app.use("/api/admin/products", adminProductRouter); // Admin product management routes
+app.use("/api/admin/orders", adminOrderRouter); // Admin order management routes
+
 app.use('/api/shop/products', shopProductsRouter); // Shop product listing and details
 app.use('/api/shop/cart', shopCartRouter); // Shopping cart functionality
 app.use('/api/shop/address', shopAddressRouter); // Address handling for checkout
