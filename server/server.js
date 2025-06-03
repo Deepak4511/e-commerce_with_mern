@@ -12,7 +12,9 @@ const adminOrderRouter = require('./routes/admin/order-routes')
 const shopProductsRouter = require('./routes/shop/products-routes');
 const shopCartRouter = require('./routes/shop/cart-routes');
 const shopAddressRouter = require('./routes/shop/address-routes');
-const shopOrderRouter = require('./routes/shop/order-routes')
+const shopOrderRouter = require('./routes/shop/order-routes');
+const shopSearchRouter = require('./routes/shop/search-routes')
+
 
 
 // ------------------- DATABASE CONNECTION -------------------
@@ -58,6 +60,7 @@ app.use('/api/shop/products', shopProductsRouter); // Shop product listing and d
 app.use('/api/shop/cart', shopCartRouter); // Shopping cart functionality
 app.use('/api/shop/address', shopAddressRouter); // Address handling for checkout
 app.use('/api/shop/order', shopOrderRouter);
+app.use('/api/shop/search', shopSearchRouter);
 
 // ------------------- START THE SERVER -------------------
 app.listen(port, () => 

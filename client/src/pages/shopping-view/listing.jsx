@@ -40,19 +40,20 @@ const Shopinglisting = () => {
   const { productList, productDetails } = useSelector(
     (state) => state.shopProducts
   );
+  const { cartItems } = useSelector(state => state.shopCart);
   const { user } = useSelector((state) => state.auth);
   const [filters, setFilters] = useState({});
   const [sort, setSort] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
 
+  const categorySearchParam = searchParams.get("category");
 
   function handleSort(value) {
     setSort(value);
   }
 
   function handleFilter(getSectionId, getCurrentOption) {
-
     let copyFilters = { ...filters };
     const indexOfCurrentSection =
       Object.keys(copyFilters).indexOf(getSectionId);
@@ -77,8 +78,23 @@ const Shopinglisting = () => {
     dispatch(fetchProductDetails(getCurrentProductId));
   }
 
-  function handleAddtoCart(getCurrentProductId) {
-    console.log(getCurrentProductId);
+  function handleAddtoCart(getCurrentProductId, getTotalStock) {
+    console.log(cartItems);
+
+    let getCartItems = cartItems.items || [];
+
+    if(getCartItems.length){
+      const indexOfCurrentItem = getCartItems.findIndex(item => item.productId === getCurrentProductId);
+
+      if(indexOfCurrentItem > -1){
+
+      const getQuantity = getCartItems[indexOfCurrentItem].quantity;
+      if(getQuantity + 1 > getTotalStock){
+        toast(`Only ${getQuantity} Quantity can be added for this item`)  
+        return;
+    }
+  }
+}
 
     dispatch(
       addToCart({
@@ -87,19 +103,17 @@ const Shopinglisting = () => {
         quantity: 1,
       })
     ).then((data) => {
-      if(data?.payload.success){
+      if (data?.payload.success) {
         dispatch(fetchCartItems(user?.id));
         toast("Added to cart");
       }
     });
   }
 
-
-
   useEffect(() => {
     setSort("price-lowtohigh");
     setFilters(JSON.parse(sessionStorage.getItem("filters")) || {});
-  }, []);
+  }, [categorySearchParam]);
 
   useEffect(() => {
     if (filters && Object.keys(filters).length > 0) {
@@ -118,6 +132,8 @@ const Shopinglisting = () => {
   useEffect(() => {
     if (productDetails !== null) setOpenDetailsDialog(true);
   }, [productDetails]);
+
+  console.log(productList, "productList");
 
 
   return (

@@ -13,9 +13,24 @@ import { setProductDetails } from "@/store/shop/products-slice";
 const ProductDetailsDialog = ({ open, setOpen, productDetails }) => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
+    const { cartItems } = useSelector(state => state.shopCart);
 
-  function handleAddTocart(getCurrentProductId) {
-    console.log(getCurrentProductId);
+  function handleAddTocart(getCurrentProductId, getTotalStock) {
+    
+      let getCartItems = cartItems.items || [];
+    
+        if(getCartItems.length){
+          const indexOfCurrentItem = getCartItems.findIndex(item => item.productId === getCurrentProductId);
+    
+          if(indexOfCurrentItem > -1){
+    
+          const getQuantity = getCartItems[indexOfCurrentItem].quantity;
+          if(getQuantity + 1 > getTotalStock){
+            toast(`Only ${getQuantity} Quantity can be added for this item`)  
+            return;
+        }
+      }
+    }
 
     dispatch(
       addToCart({
@@ -79,12 +94,20 @@ const ProductDetailsDialog = ({ open, setOpen, productDetails }) => {
             <span className="text-muted-foreground">(4.5)</span>
           </div>
           <div className="mt-5 mb-5">
-            <Button
-              className="w-full "
+          {
+            productDetails?.totalStock === 0 ?  <Button disaabled
+              className="w-full  opacity-65 cursor-not-allowed pointer-events-none"
               onClick={() => handleAddTocart(productDetails?._id)}
+            >
+              Out Of Stock
+            </Button> :  <Button
+              className="w-full "
+              onClick={() => handleAddTocart(productDetails?._id, productDetails?.totalStock)}
             >
               Add to cart
             </Button>
+          }
+           
           </div>
           <Separator />
           <div className="max-h-[300px'] overflow-auto">

@@ -7,31 +7,59 @@ import { toast } from "sonner";
 
 const UserCartItemsContent = ({ cartItems }) => {
   const { user } = useSelector((state) => state.auth);
+  const { cartItems: reduxCartItems } = useSelector((state) => state.shopCart);
+  const { productList } = useSelector((state) => state.shopProducts);
   const dispatch = useDispatch();
 
+  function handleUpdateQuantity(getCartItem, typeofAction) {
+    if (typeofAction === "plus") {
+      const getCartItems = reduxCartItems.items || [];
 
-  function handleUpdateQuantity(getCartItem, typeofAction){
-    dispatch(updateCartQuantity({
-        userId : user?.id, productId : getCartItem?.productId, quantity :
-        typeofAction === 'plus' ?
-        getCartItem?.quantity + 1 : getCartItem?.quantity -1
-    }))
-    .then(data => {
-        if(data?.payload?.success){
-            toast("cart item is updated succesfullyy")
+      const indexOfCurrentItem = getCartItems.findIndex(
+        (item) => item.productId === getCartItem?.productId
+      );
+
+      const product = productList.find(
+        (product) => product._id === getCartItem?.productId
+      );
+
+      const getTotalStock = product?.totalStock || 0;
+
+      if (indexOfCurrentItem > -1) {
+        const currentQty = getCartItems[indexOfCurrentItem].quantity;
+        if (currentQty + 1 > getTotalStock) {
+          toast(`Only ${getTotalStock} quantity available for this item`);
+          return;
         }
-    })
+      }
+    }
+
+    dispatch(
+      updateCartQuantity({
+        userId: user?.id,
+        productId: getCartItem?.productId,
+        quantity:
+          typeofAction === "plus"
+            ? getCartItem?.quantity + 1
+            : getCartItem?.quantity - 1,
+      })
+    ).then((data) => {
+      if (data?.payload?.success) {
+        toast("Cart item is updated successfully");
+      }
+    });
   }
 
   function handleCartItemDelete(getCartItem) {
     dispatch(
       deleteCartItem({ userId: user?.id, productId: getCartItem?.productId })
-    ).then(data => {
-        if(data?.payload?.success){
-            toast("cart item is deleted succesfullyy")
-        }
+    ).then((data) => {
+      if (data?.payload?.success) {
+        toast("Cart item is deleted successfully");
+      }
     });
   }
+
   return (
     <div className="flex items-center space-x-4">
       <img
@@ -47,7 +75,7 @@ const UserCartItemsContent = ({ cartItems }) => {
             size="icon"
             className="h-8 w-8 rounded-full"
             disabled={cartItems?.quantity === 1}
-            onClick={()=>handleUpdateQuantity(cartItems, 'minus')}
+            onClick={() => handleUpdateQuantity(cartItems, "minus")}
           >
             <Minus className="w-4 h-4" />
             <span className="sr-only">Decrease</span>
@@ -57,7 +85,7 @@ const UserCartItemsContent = ({ cartItems }) => {
             variant="outline"
             size="icon"
             className="h-8 w-8 rounded-full"
-            onClick={()=>handleUpdateQuantity(cartItems, 'plus')}
+            onClick={() => handleUpdateQuantity(cartItems, "plus")}
           >
             <Plus className="w-4 h-4" />
             <span className="sr-only">Increase</span>
@@ -68,9 +96,8 @@ const UserCartItemsContent = ({ cartItems }) => {
         <p className="font-semibold">
           $
           {(
-            (cartItems?.salePrice > 0
-              ? cartItems?.salePrice
-              : cartItems?.price) * cartItems?.quantity
+            (cartItems?.salePrice > 0 ? cartItems?.salePrice : cartItems?.price) *
+            cartItems?.quantity
           ).toFixed(2)}
         </p>
         <Trash
@@ -82,5 +109,6 @@ const UserCartItemsContent = ({ cartItems }) => {
     </div>
   );
 };
+
 
 export default UserCartItemsContent;
