@@ -1,12 +1,8 @@
-
-const Order =require('../../models/Order')
-
-
+const Order = require("../../models/Order");
 
 const getAllOrdersOfAllUsers = async (req, res) => {
   try {
-
-    const orders = await Order.find({ });
+    const orders = await Order.find({});
 
     if (!orders.length) {
       return res.status(404).json({
@@ -26,7 +22,6 @@ const getAllOrdersOfAllUsers = async (req, res) => {
     });
   }
 };
-
 
 const getOrderDetailsForAdmin = async (req, res) => {
   try {
@@ -53,4 +48,33 @@ const getOrderDetailsForAdmin = async (req, res) => {
   }
 };
 
-module.exports = {getAllOrdersOfAllUsers, getOrderDetailsForAdmin };
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { orderStatus } = req.body;
+
+    const order = await Order.findById(id);
+
+    if (!order) {
+      return req.res.status(404).json({
+        success: false,
+        message: "order not found",
+      });
+    }
+
+    await Order.findByIdAndUpdate(id, { orderStatus });
+
+    res.status(200).json({
+      success: true,
+      message: "Order Status Updated Successfully",
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({
+      success: false,
+      message: "some message occured",
+    });
+  }
+};
+
+module.exports = { getAllOrdersOfAllUsers, getOrderDetailsForAdmin, updateOrderStatus };

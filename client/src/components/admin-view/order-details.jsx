@@ -3,9 +3,14 @@ import { DialogContent } from "../ui/dialog";
 import { Label } from "../ui/label";
 import { Separator } from "../ui/separator";
 import CommonForm from "../common/form";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Badge } from "../ui/badge";
 import { toast } from "sonner";
+import {
+  getAllOrdersForAdmin,
+  getOrderDetailsForAdmin,
+  updateOrderStatus,
+} from "@/store/admin/order-slice";
 
 const initialFormData = {
   status: "",
@@ -14,9 +19,26 @@ const initialFormData = {
 const AdminOrderDetailsView = ({ orderDetails }) => {
   const [formData, setFormData] = useState(initialFormData);
   const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
 
   function handleUpdateStatus(event) {
     event.preventDefault();
+    const { status } = formData;
+    console.log(formData)
+
+    dispatch(
+      updateOrderStatus({
+        id: orderDetails?._id,
+        orderStatus: status,
+      })
+    ).then((data) => {
+      if (data?.payload?.success) {
+        dispatch(getOrderDetailsForAdmin(orderDetails?._id));
+        dispatch(getAllOrdersForAdmin());
+        setFormData(initialFormData);
+        toast("Order Status Updated Successfully");
+      }
+    });
   }
   return (
     <DialogContent className="sm:max-w-[600px]">
@@ -98,8 +120,8 @@ const AdminOrderDetailsView = ({ orderDetails }) => {
           <CommonForm
             formControls={[
               {
-                label: "status",
-                name: "Status",
+                label: "Order Status",
+                name: "status",
                 componentType: "select",
                 options: [
                   { id: "pending", label: "Pending" },

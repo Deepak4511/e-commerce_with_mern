@@ -23,7 +23,7 @@ function MenuItems() {
   function handleNavigate(getCurrentMenuItem) {
     sessionStorage.removeItem("filters");
     const currentFilter =
-      getCurrentMenuItem.id !== "home"
+      getCurrentMenuItem.id !== "home" && getCurrentMenuItem.id !== "Products"
         ? { category: [getCurrentMenuItem.id] }
         : null;
 
@@ -61,8 +61,6 @@ function HeaderRightContent() {
     dispatch(fetchCartItems(user?.id));
   }, [dispatch]);
 
-  console.log("Cart Items Raw:", cartItems);
-
   return (
     <div className="flex lg:items-center lg:flex-row flex-col gap-4">
       <Sheet open={openCartSheet} onOpenChange={() => setOpenCartSheet(false)}>
@@ -75,7 +73,7 @@ function HeaderRightContent() {
           <span className="sr-only">User Cart</span>
         </Button>
         <UserCartWrapper
-        setOpenCartSheet={setOpenCartSheet}
+          setOpenCartSheet={setOpenCartSheet}
           cartItems={
             cartItems && cartItems.items && cartItems.items.length > 0
               ? cartItems.items
