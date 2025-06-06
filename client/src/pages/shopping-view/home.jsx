@@ -44,8 +44,10 @@ const brandsWithIcon = [
 const Shoppinghome = () => {
   const slides = [bannerone, bannertwo, bannerthree];
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { productList, productDetails } = useSelector((state) => state.shopProducts);
-    const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+  const { productList, productDetails } = useSelector(
+    (state) => state.shopProducts
+  );
+  const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -64,8 +66,6 @@ const Shoppinghome = () => {
   }
 
   function handleAddtoCart(getCurrentProductId) {
-    console.log(getCurrentProductId);
-
     dispatch(
       addToCart({
         userId: user?.id,
@@ -80,9 +80,9 @@ const Shoppinghome = () => {
     });
   }
 
-    useEffect(() => {
-      if (productDetails !== null) setOpenDetailsDialog(true);
-    }, [productDetails]);
+  useEffect(() => {
+    if (productDetails !== null) setOpenDetailsDialog(true);
+  }, [productDetails]);
 
   useEffect(() => {
     const timer = setInterval(() => {
